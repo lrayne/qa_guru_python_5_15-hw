@@ -1,4 +1,4 @@
-from selene import browser
+from selene import browser, be
 import pytest
 
 
@@ -9,6 +9,10 @@ def browser_management(request):
     width, height = map(int, request.param.split('x'))
     browser.config.window_width = width
     browser.config.window_height = height
+
+    yield
+
+    browser.quit()
 
 
 desktop_only = pytest.mark.parametrize(
@@ -23,11 +27,11 @@ mobile_only = pytest.mark.parametrize(
 @desktop_only
 def test_github_desktop(browser_management):
     browser.open('https://github.com')
-    browser.element('.HeaderMenu-link--sign-in').click()
+    browser.element('.HeaderMenu-link--sign-in').should(be.clickable).click()
 
 
 @mobile_only
 def test_github_mobile(browser_management):
     browser.open('https://github.com')
     browser.element('.Button--link').click()
-    browser.element('.HeaderMenu-link--sign-in').click()
+    browser.element('.HeaderMenu-link--sign-in').should(be.clickable).click()

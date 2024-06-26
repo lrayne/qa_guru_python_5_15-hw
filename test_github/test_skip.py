@@ -1,5 +1,5 @@
 import pytest
-from selene import browser
+from selene import browser, be
 
 
 @pytest.fixture(
@@ -10,12 +10,14 @@ def browser_management(request):
         width, height = map(int, request.param.split('x'))
         browser.config.window_width = width
         browser.config.window_height = height
-        return 'desktop'
+        yield 'desktop'
     elif request.param in ['390x844', '414x896', '375x812']:
         width, height = map(int, request.param.split('x'))
         browser.config.window_width = width
         browser.config.window_height = height
-        return 'mobile'
+        yield 'mobile'
+
+    browser.quit()
 
 
 def test_github_desktop(browser_management):
@@ -23,7 +25,7 @@ def test_github_desktop(browser_management):
         pytest.skip(reason='Не запускаем mobile')
 
     browser.open('https://github.com')
-    browser.element('.HeaderMenu-link--sign-in').click()
+    browser.element('.HeaderMenu-link--sign-in').should(be.clickable).click()
 
 
 def test_github_mobile(browser_management):
@@ -32,4 +34,4 @@ def test_github_mobile(browser_management):
 
     browser.open('https://github.com')
     browser.element('.Button--link').click()
-    browser.element('.HeaderMenu-link--sign-in').click()
+    browser.element('.HeaderMenu-link--sign-in').should(be.clickable).click()
