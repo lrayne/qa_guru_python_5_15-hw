@@ -6,13 +6,20 @@ from selene import browser
     params=['1920x1080', '1366x768', '1536x864', '390x844', '414x896', '375x812']
 )
 def browser_management(request):
-    browser.config.window_width = int(request.param.split('x')[0])
-    browser.config.window_height = int(request.param.split('x')[1])
-    return request.param
+    if request.param in ['1920x1080', '1366x768', '1536x864']:
+        width, height = map(int, request.param.split('x'))
+        browser.config.window_width = width
+        browser.config.window_height = height
+        return 'desktop'
+    elif request.param in ['390x844', '414x896', '375x812']:
+        width, height = map(int, request.param.split('x'))
+        browser.config.window_width = width
+        browser.config.window_height = height
+        return 'mobile'
 
 
 def test_github_desktop(browser_management):
-    if browser_management in ['390x844', '414x896', '375x812']:
+    if browser_management == 'mobile':
         pytest.skip(reason='Не запускаем mobile')
 
     browser.open('https://github.com')
@@ -20,7 +27,7 @@ def test_github_desktop(browser_management):
 
 
 def test_github_mobile(browser_management):
-    if browser_management in ['1920x1080', '1366x768', '1536x864']:
+    if browser_management == 'desktop':
         pytest.skip(reason='Не запускаем desktop')
 
     browser.open('https://github.com')
